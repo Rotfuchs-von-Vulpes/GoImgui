@@ -6,9 +6,9 @@ import (
 
 	"github.com/inkyblackness/imgui-go/v4"
 
-	"OpenGLTest/imgui/internal/example"
-	"OpenGLTest/imgui/internal/platform"
-	"OpenGLTest/imgui/internal/renderer"
+	"OpenGLImguiGoTest/imgui/internal/example"
+	"OpenGLImguiGoTest/imgui/internal/platform"
+	"OpenGLImguiGoTest/imgui/internal/renderer"
 )
 
 func Get() func() {

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	imgui "OpenGLTest/imgui/cmd"
+	imgui "OpenGLImguiGoTest/imgui/cmd"
 
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/veandco/go-sdl2/sdl"
