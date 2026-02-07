@@ -11,46 +11,56 @@ import (
 	"OpenGLImguiGoTest/imgui/internal/renderer"
 )
 
-func Get() func() {
-	context := imgui.CreateContext(nil)
-	defer context.Destroy()
-	io := imgui.CurrentIO()
-
-	platform, err := platform.NewSDL(io, platform.SDLClientAPIOpenGL3)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(-1)
-	}
-	defer platform.Dispose()
-
-	renderer, err := renderer.NewOpenGL2(io)
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(-1)
-	}
-	defer renderer.Dispose()
-
-	return example.GetRenderFunc(platform, renderer)
+type Gui struct {
+	context  *imgui.Context
+	platform *platform.SDL
+	renderer *renderer.OpenGL3
+	io       *imgui.IO
+	app      example.AppData
 }
 
-func Run() {
-	context := imgui.CreateContext(nil)
-	defer context.Destroy()
+func GetImgui() Gui {
+	return Gui{}
+}
+
+func (s *Gui) Init() {
+	s.context = imgui.CreateContext(nil)
 	io := imgui.CurrentIO()
 
-	platform, err := platform.NewSDL(io, platform.SDLClientAPIOpenGL2)
+	var err error
+	s.platform, err = platform.NewSDL(io, platform.SDLClientAPIOpenGL2)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
-	defer platform.Dispose()
 
-	renderer, err := renderer.NewOpenGL2(io)
+	s.renderer, err = renderer.NewOpenGL3(io)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
-	defer renderer.Dispose()
 
-	example.Run(platform, renderer)
+	s.app = example.GetApp()
+	s.app.Init(s.platform)
+}
+
+// func (s *Gui) Run() {
+// 	s.context.SetCurrent()
+// 	example.Run(s.platform, s.renderer)
+// }
+
+func (s *Gui) Render() {
+	s.context.SetCurrent()
+	s.app.Render(s.platform, s.renderer)
+}
+
+func (s *Gui) ShouldStop() bool {
+	return s.platform.ShouldStop()
+}
+
+func (s *Gui) Close() {
+	s.context.SetCurrent()
+	s.renderer.Dispose()
+	s.platform.Dispose()
+	s.context.Destroy()
 }
