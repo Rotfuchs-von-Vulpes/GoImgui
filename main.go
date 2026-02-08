@@ -1,7 +1,7 @@
 package main
 
 import (
-	imgui "OpenGLImguiGoTest/imgui/cmd"
+	imgui "GoImgui/imgui/cmd"
 )
 
 func main() {

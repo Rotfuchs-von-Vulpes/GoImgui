@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"OpenGLImguiGoTest/imgui/internal/demo"
+	"GoImgui/imgui/internal/demo"
 
 	"github.com/inkyblackness/imgui-go/v4"
 )

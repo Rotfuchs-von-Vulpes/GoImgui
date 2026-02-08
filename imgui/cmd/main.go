@@ -6,9 +6,9 @@ import (
 
 	"github.com/inkyblackness/imgui-go/v4"
 
-	"OpenGLImguiGoTest/imgui/internal/example"
-	"OpenGLImguiGoTest/imgui/internal/platform"
-	"OpenGLImguiGoTest/imgui/internal/renderer"
+	"GoImgui/imgui/internal/example"
+	"GoImgui/imgui/internal/platform"
+	"GoImgui/imgui/internal/renderer"
 )
 
 type Gui struct {
