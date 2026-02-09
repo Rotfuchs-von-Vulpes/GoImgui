@@ -6,9 +6,10 @@ import (
 
 	"github.com/inkyblackness/imgui-go/v4"
 
-	"GoImgui/imgui/internal/example"
+	app "GoImgui/imgui/internal/example"
 	"GoImgui/imgui/internal/platform"
 	"GoImgui/imgui/internal/renderer"
+	"GoImgui/util"
 )
 
 type Gui struct {
@@ -16,32 +17,29 @@ type Gui struct {
 	platform *platform.SDL
 	renderer *renderer.OpenGL3
 	io       *imgui.IO
-	app      example.AppData
+	app      app.AppData
 }
 
-func GetImgui() Gui {
-	return Gui{}
-}
+var g Gui
 
-func (s *Gui) Init() {
-	s.context = imgui.CreateContext(nil)
+func Init() {
+	g.context = imgui.CreateContext(nil)
 	io := imgui.CurrentIO()
 
 	var err error
-	s.platform, err = platform.NewSDL(io, platform.SDLClientAPIOpenGL2)
+	g.platform, err = platform.NewSDL(io, platform.SDLClientAPIOpenGL2)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
 
-	s.renderer, err = renderer.NewOpenGL3(io)
+	g.renderer, err = renderer.NewOpenGL3(io)
 	if err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(-1)
 	}
 
-	s.app = example.GetApp()
-	s.app.Init(s.platform)
+	app.Init(g.platform)
 }
 
 // func (s *Gui) Run() {
@@ -49,18 +47,25 @@ func (s *Gui) Init() {
 // 	example.Run(s.platform, s.renderer)
 // }
 
-func (s *Gui) Render() {
-	s.context.SetCurrent()
-	s.app.Render(s.platform, s.renderer)
+func PreRender() {
+	app.PreRender(g.platform, g.renderer)
 }
 
-func (s *Gui) ShouldStop() bool {
-	return s.platform.ShouldStop()
+func Render() {
+	app.Render(g.platform, g.renderer)
 }
 
-func (s *Gui) Close() {
-	s.context.SetCurrent()
-	s.renderer.Dispose()
-	s.platform.Dispose()
-	s.context.Destroy()
+func GetData() util.Data {
+	return app.GetData()
+}
+
+func ShouldStop() bool {
+	return g.platform.ShouldStop()
+}
+
+func Close() {
+	g.context.SetCurrent()
+	g.renderer.Dispose()
+	g.platform.Dispose()
+	g.context.Destroy()
 }

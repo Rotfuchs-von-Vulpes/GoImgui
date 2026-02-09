@@ -1,21 +1,26 @@
 package main
 
 import (
-	imgui "GoImgui/imgui/cmd"
+	gui "GoImgui/imgui/cmd"
+	"GoImgui/renderer"
 )
 
 func main() {
 	var running bool
 
-	gui := imgui.GetImgui()
 	gui.Init()
+	renderer.Init()
 
 	running = true
 	for running {
+		data := gui.GetData()
+		gui.PreRender()
+		renderer.Render(data)
 		gui.Render()
 		if gui.ShouldStop() {
 			running = false
 		}
 	}
 	gui.Close()
+	renderer.Nuke()
 }

@@ -3,7 +3,6 @@ package renderer
 import (
 	_ "embed"
 	"fmt"
-	"strings"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/inkyblackness/imgui-go/v4"
@@ -14,12 +13,6 @@ var unversionedVertexShader string
 
 //go:embed gl-shader/main.frag
 var unversionedFragmentShader string
-
-//go:embed gl-shader/triangle.vert
-var vertexShader2 string
-
-//go:embed gl-shader/triangle.frag
-var fragmentShader2 string
 
 // OpenGL3 implements a renderer based on github.com/go-gl/gl (v3.2-core).
 type OpenGL3 struct {
@@ -65,16 +58,6 @@ func NewOpenGL3(io imgui.IO) (*OpenGL3, error) {
 // Dispose cleans up the resources.
 func (renderer *OpenGL3) Dispose() {
 	renderer.invalidateDeviceObjects()
-}
-
-// PreRender clears the framebuffer.
-func (renderer *OpenGL3) PreRender(clearColor [3]float32) {
-	gl.ClearColor(clearColor[0], clearColor[1], clearColor[2], 1.0)
-	gl.Clear(gl.COLOR_BUFFER_BIT)
-
-	gl.UseProgram(renderer.triangleShaderHandle)
-	gl.BindVertexArray(renderer.triangleVAO)
-	gl.DrawArrays(gl.TRIANGLES, 0, 3)
 }
 
 // Render translates the ImGui draw data to OpenGL3 commands.
@@ -233,19 +216,6 @@ func (renderer *OpenGL3) Render(displaySize [2]float32, framebufferSize [2]float
 	gl.Scissor(lastScissorBox[0], lastScissorBox[1], lastScissorBox[2], lastScissorBox[3])
 }
 
-func glError(handle uint32, statusType uint32, getIV func(uint32, uint32, *int32), getInfoLog func(uint32, int32, *int32, *uint8), failureMsg string) {
-	var status int32
-	getIV(handle, statusType, &status)
-	if status == gl.FALSE {
-		var logLength int32
-		getIV(handle, gl.INFO_LOG_LENGTH, &logLength)
-
-		infoLog := strings.Repeat("\x00", int(logLength))
-		getInfoLog(handle, logLength, nil, gl.Str(infoLog))
-		fmt.Println(failureMsg+"\n", infoLog)
-	}
-}
-
 const FLOAT_SIZE = 4
 
 func (renderer *OpenGL3) createDeviceObjects() {
@@ -294,47 +264,6 @@ func (renderer *OpenGL3) createDeviceObjects() {
 	gl.BindTexture(gl.TEXTURE_2D, uint32(lastTexture))
 	gl.BindBuffer(gl.ARRAY_BUFFER, uint32(lastArrayBuffer))
 	gl.BindVertexArray(uint32(lastVertexArray))
-
-	// gl.Enable(gl.DEPTH_TEST)
-	// gl.Enable(gl.SRGB_ALPHA)
-	// gl.ClearColor(0.2, 0.2, 0.3, 1.0)
-	// gl.ClearDepth(1)
-	// gl.DepthFunc(gl.LEQUAL)
-	// gl.Viewport(0, 0, int32(rende), int32(winHeight))
-
-	renderer.triangleShaderHandle = gl.CreateProgram()
-	vertHandle := gl.CreateShader(gl.VERTEX_SHADER)
-	fragHandle := gl.CreateShader(gl.FRAGMENT_SHADER)
-	glShaderSource(vertHandle, vertexShader2+"\x00")
-	glShaderSource(fragHandle, fragmentShader2+"\x00")
-	gl.CompileShader(vertHandle)
-	glError(vertHandle, gl.COMPILE_STATUS, gl.GetShaderiv, gl.GetShaderInfoLog, "Vertex shader error")
-	gl.CompileShader(fragHandle)
-	glError(vertHandle, gl.COMPILE_STATUS, gl.GetShaderiv, gl.GetShaderInfoLog, "Fragment shader error")
-	gl.AttachShader(renderer.triangleShaderHandle, vertHandle)
-	gl.AttachShader(renderer.triangleShaderHandle, fragHandle)
-	gl.LinkProgram(renderer.triangleShaderHandle)
-	glError(renderer.triangleShaderHandle, gl.LINK_STATUS, gl.GetProgramiv, gl.GetProgramInfoLog, "Linking program error")
-	gl.DeleteShader(vertHandle)
-	gl.DeleteShader(fragHandle)
-
-	vertices := []float32{
-		-0.5, -0.5, 0.0,
-		0.5, -0.5, 0.0,
-		0.0, 0.5, 0.0,
-	}
-
-	gl.GenVertexArrays(1, &renderer.triangleVAO)
-	gl.GenBuffers(1, &renderer.triangleVBO)
-	gl.BindVertexArray(renderer.triangleVAO)
-
-	gl.BindBuffer(gl.ARRAY_BUFFER, renderer.triangleVBO)
-	gl.BufferData(gl.ARRAY_BUFFER, int(FLOAT_SIZE)*len(vertices), gl.Ptr(&vertices[0]), gl.STATIC_DRAW)
-
-	gl.VertexAttribPointer(0, 3, gl.FLOAT, false, 3*FLOAT_SIZE, nil)
-	gl.EnableVertexAttribArray(0)
-	gl.BindBuffer(gl.ARRAY_BUFFER, 0)
-	gl.BindVertexArray(0)
 }
 
 func (renderer *OpenGL3) createFontsTexture() {
@@ -396,9 +325,4 @@ func (renderer *OpenGL3) invalidateDeviceObjects() {
 		imgui.CurrentIO().Fonts().SetTextureID(0)
 		renderer.fontTexture = 0
 	}
-
-	gl.UseProgram(renderer.triangleShaderHandle)
-	gl.DeleteVertexArrays(1, &renderer.triangleVAO)
-	gl.DeleteBuffers(1, &renderer.triangleVBO)
-	gl.DeleteProgram(renderer.triangleShaderHandle)
 }
