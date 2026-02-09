@@ -6,7 +6,7 @@ import (
 
 	"github.com/inkyblackness/imgui-go/v4"
 
-	app "GoImgui/imgui/internal/example"
+	app "GoImgui/imgui/internal/input"
 	"GoImgui/imgui/internal/platform"
 	"GoImgui/imgui/internal/renderer"
 	"GoImgui/util"
