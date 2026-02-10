@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/Rotfuchs-von-Vulpes/imgui-go/v4"
 	"github.com/go-gl/gl/v3.3-core/gl"
-	"github.com/inkyblackness/imgui-go/v4"
 )
 
 //go:embed gl-shader/main.vert

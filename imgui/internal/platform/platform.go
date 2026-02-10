@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/inkyblackness/imgui-go/v4"
+	"github.com/Rotfuchs-von-Vulpes/imgui-go/v4"
 	"github.com/veandco/go-sdl2/sdl"
 )
 

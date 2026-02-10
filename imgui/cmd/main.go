@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/inkyblackness/imgui-go/v4"
+	"github.com/Rotfuchs-von-Vulpes/imgui-go/v4"
 
 	app "GoImgui/imgui/internal/input"
 	"GoImgui/imgui/internal/platform"
